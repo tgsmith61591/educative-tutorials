@@ -12,6 +12,7 @@ services:
       AWAIT_SECONDS: 60
     volumes:
       - ./:/app
+      - ./tests/func/features:/app/features
 
   # The flask server that we'll wait on
   timezone-app-test:

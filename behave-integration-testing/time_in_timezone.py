@@ -74,7 +74,7 @@ def post():
         body = answer.strftime(fmt)
 
     except UnknownTimeZoneError:
-        msg = f"Bad timezone received: {req['timezone']}"
+        msg = f"Bad timezone received: '{req['timezone']}'"
         errors.append(msg)
         logger.error(msg)
 

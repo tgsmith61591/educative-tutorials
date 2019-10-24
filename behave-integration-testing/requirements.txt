@@ -1,2 +1,4 @@
 flask
+pytz
+requests
 behave==1.2.6

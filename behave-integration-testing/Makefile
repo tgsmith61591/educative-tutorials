@@ -9,7 +9,7 @@ build:
 .PHONY: test-integration
 test-integration:
 	docker-compose down
-	docker-compose run my-cool-timezone-app:local /bin/bash -c '\
+	docker-compose run timezone-app-behave /bin/bash -c '\
 		set -e; \
 		behave; \
 	' || (docker-compose logs && exit 1)

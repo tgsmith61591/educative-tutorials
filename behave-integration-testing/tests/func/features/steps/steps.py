@@ -37,4 +37,33 @@ def wait_for_server(context):
     context.ready = True
 
 
+@when('the "{payload}" is posted')
+def post_payload(context, payload):
+    payload = json.loads(payload)
+    response = requests.post('http://timezone-app-test:9000/get-time',
+                             data=json.dumps(payload),
+                             headers={'Content-type': 'application/json'})
+    context.response = response
 
+
+@then('the status is "{status}"')
+def assert_status(context, status):
+    response = context.response.json()
+    assert response['status'] == status, \
+        f"\nExpected: '{status}'" \
+        f"\nGot: '{response}'"
+
+
+@then('the return code is "{return_code}"')
+def assert_return_code(context, return_code):
+    assert context.response.status_code == int(return_code), \
+        f"\nExpected: '{return_code}'" \
+        f"\nGot: '{context.status_code}'"
+
+
+@then('the response contains "{field}"')
+def assert_contains_field(context, field):
+    response = context.response.json()
+    assert field in response, \
+        f"\nExpected: '{field}' present" \
+        f"\nGot: '{response}'"
