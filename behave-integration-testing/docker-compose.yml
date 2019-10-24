@@ -1,0 +1,20 @@
+version: '3'
+services:
+
+  # We'll use this as the behave client. It uses the same base image because
+  # it has the same dependencies
+  timezone-app-behave:
+    image: my-cool-timezone-app:local
+    depends_on:
+      - timezone-app-test
+    working_dir: /app
+    environment:
+      AWAIT_SECONDS: 60
+    volumes:
+      - ./:/app
+
+  # The flask server that we'll wait on
+  timezone-app-test:
+    image: my-cool-timezone-app:local
+    ports:
+      - 9000:9000
