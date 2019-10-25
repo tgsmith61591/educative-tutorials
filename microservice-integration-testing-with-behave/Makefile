@@ -11,5 +11,10 @@ test-integration:
 	docker-compose down
 	docker-compose run timezone-app-behave /bin/bash -c '\
 		set -e; \
-		behave; \
+		cd /app/tests/func && behave; \
 	' || (docker-compose logs && exit 1)
+
+.PHONY: test-integration-shell
+test-integration-shell:
+	docker-compose down
+	docker-compose run timezone-app-behave /bin/bash

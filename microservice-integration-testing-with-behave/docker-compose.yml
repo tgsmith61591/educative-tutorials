@@ -12,10 +12,11 @@ services:
       AWAIT_SECONDS: 60
     volumes:
       - ./:/app
-      - ./tests/func/features:/app/features
 
   # The flask server that we'll wait on
   timezone-app-test:
     image: my-cool-timezone-app:local
     ports:
-      - 9000:9000
+      - 8000:9000
+    volumes:
+      - ./:/app

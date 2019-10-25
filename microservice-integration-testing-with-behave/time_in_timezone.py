@@ -28,28 +28,26 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 
-@app.route('/ping', methods=['GET'])
+@app.route('/ping')
 def ping():
     """Determine if the service is healthy and serving"""
     requestor = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
     logger.info(f"Health check requested by ip='{requestor}'")
-    content = {'status': 'OK', 'body': 'pong'}
-    return flask.Response(content,
-                          status=200,
-                          mimetype='application/json')
+    return make_response(
+        jsonify(status="Serving",
+                body="pong"), 200)
 
 
-@app.route('/help', methods=['GET'])
-def help():
+@app.route('/help')
+def get_help():
     """Return a helpful message"""
     body = 'Accepted args:' \
            '\n\ttimezone: (required)' \
            '\n\tformat: (optional)' \
            '\nExample: {"timezone": "UTC", "format": "MM/dd/yyyy hh:mm tt"}'
-    content = {'status': 'OK', 'body': body}
-    return flask.Response(content,
-                          status=200,
-                          mimetype='application/json')
+    return make_response(
+        jsonify(status='OK',
+                body=body), 200)
 
 
 @app.route('/get-time', methods=['POST'])
@@ -59,12 +57,12 @@ def post():
         logger.error(f"Request data type is not json (content_type="
                      f"'{flask.request.content_type}')")
         return make_response(
-            jsonify({"status": "Error",
-                     "errors": ['Only JSON data is supported']}), 415)
+            jsonify(status="Error",
+                    errors=['Only JSON data is supported']), 415)
 
     errors = []
     body = None
-    code = 417
+    code = 417  # default to bad data status code unless it passes
 
     req = request.get_json()
     try:
@@ -73,24 +71,26 @@ def post():
         fmt = req.get('format', "yyyy-MM-dd hh:mm:ss tt")
         body = answer.strftime(fmt)
 
+    # If the user passes an unknown timezone, we need to handle it gracefully
     except UnknownTimeZoneError:
         msg = f"Bad timezone received: '{req['timezone']}'"
         errors.append(msg)
         logger.error(msg)
 
+    # We can get a keyerror if 'timezone' is not provided in the request
     except KeyError:
         logger.error(f"Received KeyError: {req}")
         errors.append("'timezone' is a required field")
 
-    else:
-        code = 200
-
-    response = {'status': 'OK' if not errors else 'Error'}
     if errors:
-        response['errors'] = errors
-    else:
-        response['body'] = body
-    return make_response(jsonify(response), code)
+        return make_response(
+            jsonify(status='Error',
+                    errors=errors), code)
+
+    # Otherwise everything is good!
+    return make_response(
+        jsonify(status='OK',
+                body=body), 200)
 
 
 if __name__ == "__main__":

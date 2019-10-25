@@ -3,12 +3,14 @@
 from behave import given, when, then
 from datetime import timedelta
 import requests
+import datetime
 import time
 import json
 import os
 
 
 class AwaitTimeout(BaseException):
+    """An exception we'll raise if we time out"""
     pass
 
 
@@ -27,7 +29,8 @@ def wait_for_server(context):
 
         # try to ping the healthcheck endpoint
         response = requests.get('http://timezone-app-test:9000/ping')
-        if response.status_code == 200:
+        if response.status_code == 200 and \
+                response.json()['status'] == "Serving":
             break
 
         running_timeout += timedelta(milliseconds=10)
@@ -43,6 +46,7 @@ def post_payload(context, payload):
     response = requests.post('http://timezone-app-test:9000/get-time',
                              data=json.dumps(payload),
                              headers={'Content-type': 'application/json'})
+    context.payload = payload
     context.response = response
 
 
@@ -67,3 +71,22 @@ def assert_contains_field(context, field):
     assert field in response, \
         f"\nExpected: '{field}' present" \
         f"\nGot: '{response}'"
+
+
+@then('the response contains a valid timestamp')
+def assert_valid_timestamp(context):
+    fmt = context.payload['format']
+    response = context.response.json()
+    datetime.datetime.strptime(response["body"], fmt)
+
+
+@then('the user can ask for help')
+def user_asks_for_help(context):
+    response = requests.get('http://timezone-app-test:9000/help')
+    context.response = response
+
+
+@then('help is given')
+def assert_help_given(context):
+    response = context.response.json()
+    assert 'Example' in response['body']
