@@ -44,7 +44,7 @@ def get_help():
     body = 'Accepted args:' \
            '\n\ttimezone: (required)' \
            '\n\tformat: (optional)' \
-           '\nExample: {"timezone": "UTC", "format": "MM/dd/yyyy hh:mm tt"}'
+           '\nExample: {"timezone": "UTC", "format": "%Y-%m-%d %H:%M:%S %p"}'
     return make_response(
         jsonify(status='OK',
                 body=body), 200)
@@ -68,8 +68,9 @@ def post():
     try:
         tz = pytz.timezone(req['timezone'])
         answer = datetime.datetime.now(tz=tz)
-        fmt = req.get('format', "yyyy-MM-dd hh:mm:ss tt")
+        fmt = req.get('format', "%Y-%m-%d %H:%M:%S %p")
         body = answer.strftime(fmt)
+        logger.info(f"Timezone requested: {req['timezone']}, answer={body}")
 
     # If the user passes an unknown timezone, we need to handle it gracefully
     except UnknownTimeZoneError:
