@@ -4,7 +4,7 @@ Feature: The timezone service works
       Given the flask server is ready
        When the "<payload>" is posted
        Then the status is "<status>"
-       Then the return code is "<return_code>"
+        And the return code is "<return_code>"
 
     Examples: <payload>, <status>, <return_code>
       | payload              | status   | return_code  |
