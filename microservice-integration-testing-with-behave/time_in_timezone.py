@@ -83,6 +83,11 @@ def post():
         logger.error(f"Received KeyError: {req}")
         errors.append("'timezone' is a required field")
 
+    # Anything else.. a bad format might cause a re.error
+    except Exception as e:
+        logger.error(f"Unknown exception occurred: {e} (input={req})")
+        errors.append("Something went wrong. Check your input")
+
     if errors:
         return make_response(
             jsonify(status='Error',

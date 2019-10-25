@@ -30,8 +30,8 @@ Feature: The timezone service works
 
     Examples: <payload>
       | payload                                                 |
-      | {"timezone": "UTC", "format": "%Y-%M-%d %H:%M:%S %p"}   |
-      | {"timezone": "UTC", "format": "%M/%d/%Y %H:%M"}         |
+      | {"timezone": "UTC", "format": "%Y-%m-%d %H:%M:%S %p"}   |
+      | {"timezone": "UTC", "format": "%m/%d/%Y %H:%M"}         |
 
   # No examples needed here, since it's the same every time. So we use the
   # "Scenario" keyword rather than "Scenario Outline"
